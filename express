@@ -2,7 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 
 const app = express();
-app.use(express.json()); // Middleware to parse incoming JSON requests
+app.use(express.json()); 
 
 
 mongoose
@@ -18,17 +18,17 @@ mongoose
 
 
 const NewsSchema = new mongoose.Schema({
-  title: { type: String, required: true }, // Use 'title' for clarity
-  link: { type: String, required: true }, // Use 'link' for consistency
-  headline: { type: String, required: true }, // Use 'headline' for clarity
+  title: { type: String, required: true }, 
+  link: { type: String, required: true }, 
+  headline: { type: String, required: true }, 
 });
 
 const News = mongoose.model('News', NewsSchema);
 
 
 app.use((err, req, res, next) => {
-  console.error(err.stack); // Log errors for debugging
-  res.status(500).send({ error: 'Internal Server Error' }); // Generic error response
+  console.error(err.stack); 
+  res.status(500).send({ error: 'Internal Server Error' }); 
 });
 
 
@@ -38,7 +38,7 @@ app.post('/News', async (req, res) => {
     await newNews.save();
     res.status(201).send({ message: 'News item created successfully', News: newNews });
   } catch (error) {
-    if (error.name === 'ValidationError') { // Handle validation errors specifically
+    if (error.name === 'ValidationError') { 
       res.status(400).send({ error: error.message });
     } else {
       res.status(500).send({ error: 'Failed to create news item' });
@@ -61,7 +61,7 @@ app.put('/News/:id', async (req, res) => {
     const { id } = req.params;
     const updatedNews = await News.findByIdAndUpdate(id, req.body, {
       new: true,
-      runValidators: true, // Ensure validations are run on update
+      runValidators: true, 
     });
     if (updatedNews) {
       res.status(200).send({ message: 'News item updated successfully', News: updatedNews });
@@ -69,7 +69,7 @@ app.put('/News/:id', async (req, res) => {
       res.status(404).send({ error: 'News item not found' });
     }
   } catch (error) {
-    if (error.name === 'CastError') { // Handle invalid ID errors
+    if (error.name === 'CastError') {
       res.status(400).send({ error: 'Invalid news item ID' });
     } else {
       res.status(500).send({ error: 'Failed to update news item' });
@@ -88,7 +88,7 @@ app.delete('/News/:id', async (req, res) => {
       res.status(404).send({ error: 'News item not found' });
     }
   } catch (error) {
-    if (error.name === 'CastError') { // Handle invalid ID errors
+    if (error.name === 'CastError') { 
       res.status(400).send({ error: 'Invalid news item ID' });
     } else {
       res.status(500).send({ error: 'Failed to delete news item' });
