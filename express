@@ -1,0 +1,100 @@
+const express = require('express');
+const mongoose = require('mongoose');
+
+const app = express();
+app.use(express.json()); // Middleware to parse incoming JSON requests
+
+
+mongoose
+  .connect('mongodb://127.0.0.1:27017/productsdb', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1); // Exit on connection failure for clarity
+  });
+
+
+const NewsSchema = new mongoose.Schema({
+  title: { type: String, required: true }, // Use 'title' for clarity
+  link: { type: String, required: true }, // Use 'link' for consistency
+  headline: { type: String, required: true }, // Use 'headline' for clarity
+});
+
+const News = mongoose.model('News', NewsSchema);
+
+
+app.use((err, req, res, next) => {
+  console.error(err.stack); // Log errors for debugging
+  res.status(500).send({ error: 'Internal Server Error' }); // Generic error response
+});
+
+
+app.post('/News', async (req, res) => {
+  try {
+    const newNews = new News(req.body);
+    await newNews.save();
+    res.status(201).send({ message: 'News item created successfully', News: newNews });
+  } catch (error) {
+    if (error.name === 'ValidationError') { // Handle validation errors specifically
+      res.status(400).send({ error: error.message });
+    } else {
+      res.status(500).send({ error: 'Failed to create news item' });
+    }
+  }
+});
+
+app.get('/News', async (req, res) => {
+  try {
+    const news = await News.find();
+    res.status(200).send(news);
+  } catch (error) {
+    res.status(500).send({ error: 'Failed to fetch news items' });
+  }
+});
+
+
+app.put('/News/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updatedNews = await News.findByIdAndUpdate(id, req.body, {
+      new: true,
+      runValidators: true, // Ensure validations are run on update
+    });
+    if (updatedNews) {
+      res.status(200).send({ message: 'News item updated successfully', News: updatedNews });
+    } else {
+      res.status(404).send({ error: 'News item not found' });
+    }
+  } catch (error) {
+    if (error.name === 'CastError') { // Handle invalid ID errors
+      res.status(400).send({ error: 'Invalid news item ID' });
+    } else {
+      res.status(500).send({ error: 'Failed to update news item' });
+    }
+  }
+});
+
+
+app.delete('/News/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedNews = await News.findByIdAndDelete(id);
+    if (deletedNews) {
+      res.status(200).send({ message: 'News item deleted successfully' });
+    } else {
+      res.status(404).send({ error: 'News item not found' });
+    }
+  } catch (error) {
+    if (error.name === 'CastError') { // Handle invalid ID errors
+      res.status(400).send({ error: 'Invalid news item ID' });
+    } else {
+      res.status(500).send({ error: 'Failed to delete news item' });
+    }
+  }
+});
+
+const PORT = 3000;
+app.listen(PORT, () =>
