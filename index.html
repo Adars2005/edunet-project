@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>News Application</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>News Application</h1>
+
+    <!-- Form for creating new news -->
+    <form id="newsForm">
+      <input type="text" id="title" placeholder="Title" required>
+      <input type="url" id="link" placeholder="Link" required>
+      <input type="text" id="headline" placeholder="Headline" required>
+      <button type="submit">Create News</button>
+    </form>
+
+    <!-- List of News Items -->
+    <h2>All News</h2>
+    <ul id="newsList"></ul>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
